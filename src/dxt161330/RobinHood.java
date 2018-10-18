@@ -111,27 +111,4 @@ public class RobinHood<T> {
 	static<T> int distinctElements(T[ ] arr) { 
 		return 0;
 	}
-
-	public static void main(String[] args) {
-
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Enter size of the table ");
-		int size = sc.nextInt();
-		// give size=16 for testing
-		RobinHood<Integer> rb = new RobinHood<>(size);
-
-		rb.add(12497);
-		rb.add(28754);
-		rb.add(34678);
-		rb.add(45500);
-		rb.add(56699);
-		rb.add(67891);
-		rb.add(70011);
-		rb.add(81209);
-		rb.add(99194);
-		rb.add(18608);
-		
-		System.out.println("hashtable: " + Arrays.toString(rb.table));
-		
-	}
 }
