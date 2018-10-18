@@ -1,22 +1,20 @@
 package dxt161330;
 
-import java.util.Arrays;
-import java.util.Scanner;
-
-public class RobinHood<T> {
+public class RobinHood<T> implements HashingAlgorithm<T>{
 
 	Object table[];
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
-	int free[];
-	int size, numofElements ;
+	private int free[];
+	private int capacity, size;
 
-	RobinHood(int size){
-		this.size = size;
-		table = new Object[this.size];
-		free = new int[this.size];
-		numofElements = 0;
+	RobinHood(int capacity){
+		this.capacity = capacity;
+		table = new Object[this.capacity];
+		free = new int[this.capacity];
+		size = 0;
 	}
 
+	@Override
 	public boolean add(T x) {
 
 		if(contains(x)) {
@@ -26,20 +24,20 @@ public class RobinHood<T> {
 		int location = hashCode(x);
 		int displacement = 0;
 
-		while(numofElements != size) {
+		while(size != capacity) {
 			if(free[location]==0 || free[location]==2) {
 				table[location] = x;
-				numofElements++;
+				size++;
 				free[location] = 1;
 				return true;
 			} else if(displacement((T) table[location], location) >= displacement(x, location)) {
 				displacement++;
-				location = (location + 1) % size;
+				location = (location + 1) % capacity;
 			} else {
 				T temp = x;
 				x = (T) table[location];
 				table[location] = temp;
-				location = (location + 1) % size;
+				location = (location + 1) % capacity;
 				displacement = displacement(x, location);
 			}
 		}
@@ -54,13 +52,14 @@ public class RobinHood<T> {
 			return (table.length + loc - i0);
 		}
 	}
-	
-	// temporary code for testing 
+
+	// temporary code for testing
 	public int hashCode(T x) {
-		return (int) x % 19;
+		return x.hashCode() % 19;
 	}
 
 	// Checks whether the table contains x or not
+	@Override
 	public boolean contains(T x) {
 
 		int location = find(x);
@@ -80,7 +79,7 @@ public class RobinHood<T> {
 			} else if(free[ik] == 1) {
 				break;
 			} else if(free[ik] == 2) {
-				ik = (ik + 1) % size;;
+				ik = (ik + 1) % capacity;;
 			}
 		}
 
@@ -88,7 +87,7 @@ public class RobinHood<T> {
 		
 		while(true) {
 			
-			ik = (ik + 1) % size;
+			ik = (ik + 1) % capacity;
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
@@ -99,6 +98,7 @@ public class RobinHood<T> {
 
 	}
 
+	@Override
 	public T remove(T x) {
 		int location = find(x);
 		if(table[location].equals(x)) {
