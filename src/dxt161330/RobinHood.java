@@ -102,8 +102,10 @@ public class RobinHood<T> implements HashingAlgorithm<T>{
 	public T remove(T x) {
 		int location = find(x);
 		if(table[location].equals(x)) {
+			T removedElement = (T) table[location];
 			free[location] = 2;
-			return (T) table[location];
+			table[location] = null;
+			return removedElement;
 		}
 		return null;
 	}
