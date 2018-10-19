@@ -6,6 +6,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
 	private int free[];
 	private int capacity, size;
+	private double loadFactor;
 
 	RobinHood(int capacity){
 		this.capacity = capacity;
@@ -29,6 +30,10 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 				table[location] = x;
 				size++;
 				free[location] = 1;
+				loadFactor = (double) size/capacity;
+				if(loadFactor > 0.5) {
+					rehash();
+				}
 				return true;
 			} else if(displacement((T) table[location], location) >= displacement(x, location)) {
 				displacement++;
@@ -44,6 +49,17 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		return false;
 	}
 
+	public void rehash() {
+		Object[] table2 = table;
+		capacity = 2*capacity;
+		table = new Object[capacity];
+		free = new int[capacity];
+		size=0;
+		for(int i = 0; i < table2.length; i++) {
+			if(table2[i]!=null) add((T) table2[i]);
+		}
+	}
+	
 	public int displacement(T x, int loc) {
 		int i0 = x.hashCode();
 		if(loc >= i0) {
@@ -109,6 +125,4 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	static<T> int distinctElements(T[ ] arr) { 
 		return 0;
 	}
-	
-	
 }

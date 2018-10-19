@@ -6,6 +6,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
 	private int free[];
 	private int capacity, size;
+	private double loadFactor;
 	
 	DoubleHashing(int capacity){
 		this.capacity = capacity;
@@ -26,7 +27,22 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 			table[location] = x;
 			free[location] = 1;
 			size++;
+			loadFactor = (double) size/capacity;
+			if(loadFactor > 0.5) {
+				rehash();
+			}
 			return true;
+		}
+	}
+	
+	public void rehash() {
+		Object[] table2 = table;
+		capacity = 2*capacity;
+		table = new Object[capacity];
+		free = new int[capacity];
+		size=0;
+		for(int i = 0; i < table2.length; i++) {
+			if(table2[i]!=null) add((T) table2[i]);
 		}
 	}
 	
