@@ -1,9 +1,6 @@
 package dxt161330;
 
-import java.util.Arrays;
-import java.util.Scanner;
-
-public class RobinHood<T> implements HashingAlgorithm<T>{
+public class RobinHood<T> extends HashingAlgorithm<T>{
 
 	Object table[];
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
@@ -24,7 +21,7 @@ public class RobinHood<T> implements HashingAlgorithm<T>{
 			return false;
 		}
 
-		int location = hashCode(x);
+		int location = indexFor(hash(x.hashCode()),capacity);
 		int displacement = 0;
 
 		while(size != capacity) {
@@ -48,17 +45,12 @@ public class RobinHood<T> implements HashingAlgorithm<T>{
 	}
 
 	public int displacement(T x, int loc) {
-		int i0 = hashCode(x);
+		int i0 = x.hashCode();
 		if(loc >= i0) {
 			return (loc - i0);
 		} else {
 			return (table.length + loc - i0);
 		}
-	}
-
-	// temporary code for testing
-	public int hashCode(T x) {
-		return x.hashCode() % 19;
 	}
 
 	// Checks whether the table contains x or not
@@ -74,7 +66,7 @@ public class RobinHood<T> implements HashingAlgorithm<T>{
 
 	public int find(T x) {
 
-		int ik = hashCode(x);
+		int ik = x.hashCode();
 		while(true) {
 			
 			if(free[ik] == 0 || table[ik].equals(x)) {

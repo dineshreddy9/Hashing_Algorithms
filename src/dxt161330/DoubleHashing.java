@@ -1,9 +1,6 @@
 package dxt161330;
 
-import java.util.Arrays;
-import java.util.Scanner;
-
-public class DoubleHashing<T> implements HashingAlgorithm<T> {
+public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	
 	Object table[];
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
@@ -32,11 +29,6 @@ public class DoubleHashing<T> implements HashingAlgorithm<T> {
 			return true;
 		}
 	}
-
-	// temporary code for testing
-	public int hashCode(T x) {
-		return x.hashCode() % 19;
-	}
 	
 	public int secondHashFunction(T x) {
 		return x.hashCode();
@@ -53,8 +45,7 @@ public class DoubleHashing<T> implements HashingAlgorithm<T> {
 	}
 
 	public int find(T x) {
-
-		int k = 0, ik = hashCode(x);
+		int k = 0, ik = hash(x.hashCode());
 		while(true) {
 			//ik = hashCode(x);
 			if(free[ik] == 0 || table[ik].equals(x)) {
@@ -63,7 +54,7 @@ public class DoubleHashing<T> implements HashingAlgorithm<T> {
 				break;
 			} else if(free[ik] == 1) {
 				k++;
-				ik = (hashCode(x) + k * secondHashFunction(x)) % capacity;
+				ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
 			} else if(size == capacity) {
 				return -1;
 			}
@@ -73,7 +64,7 @@ public class DoubleHashing<T> implements HashingAlgorithm<T> {
 		
 		while(true) {
 			k++;
-			ik = (hashCode(x) + k * secondHashFunction(x)) % capacity;
+			ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
