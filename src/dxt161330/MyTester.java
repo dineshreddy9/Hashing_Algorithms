@@ -6,7 +6,7 @@ import java.util.Random;
 public class MyTester {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+
 		RobinHood<Integer> rhSet = new RobinHood<>();
 		DoubleHashing<Integer> dh = new DoubleHashing<>();
 		HashSet<Integer> hs = new HashSet<>();

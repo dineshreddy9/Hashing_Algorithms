@@ -1,17 +1,28 @@
+/*
+ * @author Dinesh, Kautil
+ * RobinHood Hashing Algorithm: An Open Addressing scheme in which a new element being inserted with a larger probe
+ *  count can displace an existing element in the table with a smaller probe count.
+ * Ver 1.0: 10/15/2018 
+ */
 package dxt161330;
 
 public class RobinHood<T> extends HashingAlgorithm<T>{
-
+	
+	// to store the elements
 	Object table[];
 	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
 	private int free[];
+	// capacity is the length of the table. size is the number of elements in the table
 	private int capacity, size;
+	// loadFactor = size/capacity
 	private double loadFactor;
 	
+	// Default constructor which initializes the table with default capacity as 32 
 	RobinHood() {
 		this(32);
 	}
 	
+	// Parameterized constructor which takes initial capacity as argument
 	RobinHood(int capacity){
 		this.capacity = capacity;
 		table = new Object[this.capacity];
@@ -19,7 +30,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		size = 0;
 	}
 
-	@Override
+	// adds an element to the table
+	// returns true if the element is added successfully otherwise returns false
 	public boolean add(T x) {
 
 		if(contains(x)) {
@@ -35,6 +47,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 				size++;
 				free[location] = 1;
 				loadFactor = (double) size/capacity;
+				// considering threshold = 0.5
 				if(loadFactor > 0.5) {
 					rehash();
 				}
@@ -52,7 +65,9 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 		return false;
 	}
-
+	
+	// called when the loadfactor exceeds a threshold value
+	// capacity of the table is doubled and the elements are rehashed
 	public void rehash() {
 		Object[] table2 = table;
 		capacity = 2*capacity;
@@ -64,6 +79,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 	}
 	
+	// Calculate displacement of x from its ideal location of h(x).
 	public int displacement(T x, int loc) {
 		int i0 = indexFor(hash(x.hashCode()), capacity);
 		if(loc >= i0) {
@@ -74,7 +90,6 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	}
 
 	// Checks whether the table contains x or not
-	@Override
 	public boolean contains(T x) {
 
 		int location = find(x);
@@ -83,7 +98,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 		return false;
 	}
-
+	
+	// search for x and return index of x. If x is not found, return index where x can be added.
 	public int find(T x) {
 
 		int ik = indexFor(hash(x.hashCode()), capacity);
@@ -112,8 +128,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 
 	}
-
-	@Override
+	
+	// Removes an element. Returns the element removed if successful otherwise returns null
 	public T remove(T x) {
 		int location = find(x);
 		if(!(table[location] == null) && table[location].equals(x)) {
@@ -126,6 +142,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		return null;
 	}
 	
+	// returns the number of elements in the table
 	public int size() {
 		return size;
 	}
