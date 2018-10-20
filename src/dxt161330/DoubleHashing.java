@@ -8,6 +8,10 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	private int capacity, size;
 	private double loadFactor;
 	
+	DoubleHashing(){
+		this(32);
+	}
+	
 	DoubleHashing(int capacity){
 		this.capacity = capacity;
 		table = new Object[this.capacity];
@@ -18,7 +22,6 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	public boolean add(T x) {
 
 		int location = find(x);
-		System.out.println(location);
 		if(location == -1 || contains(x)) {
 			return false;
 		}
@@ -47,7 +50,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	}
 	
 	public int secondHashFunction(T x) {
-		return x.hashCode();
+		return Math.abs(indexFor(hash(x.hashCode()),2*capacity));
 	}
 
 	// Checks whether the table contains x or not
@@ -61,16 +64,16 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	}
 
 	public int find(T x) {
-		int k = 0, ik = hash(x.hashCode());
+		int k = 0, ik = indexFor(hash(x.hashCode()),capacity);
 		while(true) {
 			//ik = hashCode(x);
-			if(free[ik] == 0 || table[ik].equals(x)) {
+			if(free[ik] == 0 || (table[ik]!=null && table[ik].equals(x))) {
 				return ik;
 			} else if(free[ik] == 2) {
 				break;
 			} else if(free[ik] == 1) {
 				k++;
-				ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
+				ik = (indexFor(hash(x.hashCode()),capacity) + k * secondHashFunction(x)) % capacity;
 			} else if(size == capacity) {
 				return -1;
 			}
@@ -80,7 +83,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		
 		while(true) {
 			k++;
-			ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
+			ik = (indexFor(hash(x.hashCode()),capacity) + k * secondHashFunction(x)) % capacity;
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
@@ -93,7 +96,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	public T remove(T x) {
 		int location = find(x);
-		if(table[location].equals(x)) {
+		if(!(table[location] == null) && table[location].equals(x)) {
 			T removedElement = (T) table[location];
 			free[location] = 2;
 			table[location] = null;
@@ -105,5 +108,9 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	static<T> int distinctElements(T[ ] arr) { 
 		return 0;
+	}
+	
+	public int size() {
+		return size;
 	}
 }

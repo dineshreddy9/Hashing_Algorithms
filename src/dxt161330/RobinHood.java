@@ -7,7 +7,11 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	private int free[];
 	private int capacity, size;
 	private double loadFactor;
-
+	
+	RobinHood() {
+		this(32);
+	}
+	
 	RobinHood(int capacity){
 		this.capacity = capacity;
 		table = new Object[this.capacity];
@@ -61,7 +65,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	}
 	
 	public int displacement(T x, int loc) {
-		int i0 = x.hashCode();
+		int i0 = indexFor(hash(x.hashCode()), capacity);
 		if(loc >= i0) {
 			return (loc - i0);
 		} else {
@@ -82,10 +86,10 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 
 	public int find(T x) {
 
-		int ik = x.hashCode();
+		int ik = indexFor(hash(x.hashCode()), capacity);
 		while(true) {
-			
-			if(free[ik] == 0 || table[ik].equals(x)) {
+			//System.out.println(ik);
+			if(free[ik] == 0 || (table[ik]!=null && table[ik].equals(x))) {
 				return ik;
 			} else if(free[ik] == 1) {
 				break;
@@ -112,7 +116,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	@Override
 	public T remove(T x) {
 		int location = find(x);
-		if(table[location].equals(x)) {
+		if(!(table[location] == null) && table[location].equals(x)) {
 			T removedElement = (T) table[location];
 			free[location] = 2;
 			table[location] = null;
@@ -121,8 +125,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 		return null;
 	}
-
-	static<T> int distinctElements(T[ ] arr) { 
-		return 0;
+	
+	public int size() {
+		return size;
 	}
 }
