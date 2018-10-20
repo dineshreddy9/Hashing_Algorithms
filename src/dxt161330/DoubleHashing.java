@@ -10,7 +10,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	// to store the elements
 	Object table[];
-	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
+	// array to represent whether a particular index is free(0), an element exits(1), deleted(2)
 	private int free[];
 	// capacity is the length of the table. size is the number of elements in the table
 	private int capacity, size;
@@ -41,7 +41,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 		else {
 			table[location] = x;
-			free[location] = 1;
+			free[location] = OCCUPIED;
 			size++;
 			loadFactor = (double) size/capacity;
 			// considering threshold = 0.5
@@ -84,11 +84,11 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		int k = 0, ik = indexFor(hash(x.hashCode()),capacity);
 		while(true) {
 			//ik = hashCode(x);
-			if(free[ik] == 0 || (table[ik]!=null && table[ik].equals(x))) {
+			if(free[ik] == FREE || (table[ik]!=null && table[ik].equals(x))) {
 				return ik;
-			} else if(free[ik] == 2) {
+			} else if(free[ik] == DELETED) {
 				break;
-			} else if(free[ik] == 1) {
+			} else if(free[ik] == OCCUPIED) {
 				k++;
 				ik = (indexFor(hash(x.hashCode()),capacity) + k * secondHashFunction(x)) % capacity;
 			} else if(size == capacity) {
@@ -100,11 +100,11 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 		while(true) {
 			k++;
-			ik = (indexFor(hash(x.hashCode()),capacity) + k * secondHashFunction(x)) % capacity;
+			ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
-			if(free[ik] == 0) {
+			if(free[ik] == FREE) {
 				return deletedSpot;
 			}
 		}
@@ -116,7 +116,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		int location = find(x);
 		if(!(table[location] == null) && table[location].equals(x)) {
 			T removedElement = (T) table[location];
-			free[location] = 2;
+			free[location] = DELETED;
 			table[location] = null;
 			size--;
 			return removedElement;

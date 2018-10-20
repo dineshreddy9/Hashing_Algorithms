@@ -42,10 +42,10 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		int displacement = 0;
 
 		while(size != capacity) {
-			if(free[location]==0 || free[location]==2) {
+			if(free[location]==FREE || free[location]==DELETED) {
 				table[location] = x;
 				size++;
-				free[location] = 1;
+				free[location] = OCCUPIED;
 				loadFactor = (double) size/capacity;
 				// considering threshold = 0.5
 				if(loadFactor > 0.5) {
@@ -105,11 +105,11 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		int ik = indexFor(hash(x.hashCode()), capacity);
 		while(true) {
 			//System.out.println(ik);
-			if(free[ik] == 0 || (table[ik]!=null && table[ik].equals(x))) {
+			if(free[ik] == FREE || (table[ik]!=null && table[ik].equals(x))) {
 				return ik;
-			} else if(free[ik] == 1) {
+			} else if(free[ik] == OCCUPIED) {
 				break;
-			} else if(free[ik] == 2) {
+			} else if(free[ik] == DELETED) {
 				ik = (ik + 1) % capacity;;
 			}
 		}
@@ -122,7 +122,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
-			if(free[ik] == 0) {
+			if(free[ik] == FREE) {
 				return deletedSpot;
 			}
 		}
@@ -134,7 +134,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		int location = find(x);
 		if(!(table[location] == null) && table[location].equals(x)) {
 			T removedElement = (T) table[location];
-			free[location] = 2;
+			free[location] = DELETED;
 			table[location] = null;
 			size--;
 			return removedElement;
