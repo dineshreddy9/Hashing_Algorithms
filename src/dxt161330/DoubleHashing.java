@@ -31,23 +31,37 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		if(loadFactor > RESIZE_THRESHOLD) {
 			resize();
 		}
-		int location = find(x);
-		if(location == -1 || contains(x)) {
+		if(contains(x)) {
 			return false;
-		} else {
-			table[location] = x;
-			free[location] = OCCUPIED;
-			size++;
-			return true;
 		}
+
+		int k = 0;
+		int index = indexFor(hash(x.hashCode()),capacity);
+		int startIndex = index;
+		int secondHashVal = indexForHash2(x);
+		while(true) {
+			if(free[index]==FREE || free[index]==DELETED) {
+				table[index] = x;
+				size++;
+				free[index] = OCCUPIED;
+				return true;
+			}
+			if(table[index].equals(x)){
+				//we have reached to the starting point
+				break;
+			}
+			k++;
+			index = (startIndex + k * secondHashVal) % capacity;
+		}
+		return false;
 	}
 
 	/**
 	 * @param x
 	 * @return
 	 */
-	public int hash2(T x) {
-		return Math.abs(indexFor(hash(x.hashCode()),2*capacity));
+	private int hash2(T x) {
+		return hash(x.hashCode()*x.hashCode());
 	}
 
 	/**
@@ -56,9 +70,8 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	 * @return
 	 */
 	public boolean contains(T x) {
-
 		int location = find(x);
-		if(!(table[location] == null) && table[location].equals(x)) {
+		if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
 			return true;
 		}
 		return false;
@@ -69,51 +82,21 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	 * @param x
 	 * @return
 	 */
-	public int find(T x) {
-		int k = 0, ik = indexFor(hash(x.hashCode()),capacity);
-		while(true) {
-			//ik = hashCode(x);
-			if(free[ik] == FREE || (table[ik]!=null && table[ik].equals(x))) {
-				return ik;
-			} else if(free[ik] == DELETED) {
-				break;
-			} else if(free[ik] == OCCUPIED) {
-				k++;
-				ik = (indexFor(hash(x.hashCode()),capacity) + k * hash2(x)) % capacity;
-			} else if(size == capacity) {
-				return -1;
+	protected int find(T x) {
+		int k = 0;
+		int index = indexFor(hash(x.hashCode()),capacity);
+		int startIndex = index,secondHashVal = indexForHash2(x);
+		while(free[index] != FREE) { //when index has never been touched search can stop.
+			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
+				return index;
 			}
-		}
-
-		int deletedSpot = ik;
-
-		while(true) {
 			k++;
-			ik = (hash(x.hashCode()) + k * hash2(x)) % capacity;
-			if(!(table[ik] == null) && table[ik].equals(x)) {
-				return ik;
-			}
-			if(free[ik] == FREE) {
-				return deletedSpot;
-			}
+			index = (startIndex + k * secondHashVal) % capacity;
 		}
-
+		return INVALID_INDEX;
 	}
 
-	/**
-	 * Removes an element. Returns the element removed if successful otherwise returns null
-	 * @param x
-	 * @return
-	 */
-	public T remove(T x) {
-		int location = find(x);
-		if(!(table[location] == null) && table[location].equals(x)) {
-			T removedElement = (T) table[location];
-			free[location] = DELETED;
-			table[location] = null;
-			size--;
-			return removedElement;
-		}
-		return null;
+	private int indexForHash2(T x){
+		return 1 + hash2(x)%9; //+1 to avoid it being 0
 	}
 }

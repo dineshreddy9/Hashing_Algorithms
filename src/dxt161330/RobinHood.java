@@ -13,7 +13,6 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	 * ratio of size to capacity after which resize should be done to ensure optimal working <b>this</b> algorithm
 	 */
 	private static final double RESIZE_THRESHOLD = 0.5;
-	private static final int INVALID_INDEX = -1;
 
 
 	/**
@@ -79,7 +78,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	 * @param loc
 	 * @return
 	 */
-	public int displacement(T x, int loc) {
+	private int displacement(T x, int loc) {
 		int i0 = indexFor(hash(x.hashCode()), capacity);
 		if(loc >= i0) {
 			return (loc - i0);
@@ -103,10 +102,9 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	 * @param x
 	 * @return
 	 */
-	private int find(T x) {
+	protected int find(T x) {
 		int index = indexFor(hash(x.hashCode()), capacity);
 		while(free[index] != FREE) { //when index has never been touched search can stop.
-			//System.out.println(ik);
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
 			}
@@ -115,18 +113,5 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		return INVALID_INDEX;
 	}
 
-	/**
-	 *	Removes an element. Returns the element removed if successful otherwise returns null
- 	 */
-	public T remove(T x) {
-		int location = find(x);
-		if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
-			T removedElement = (T) table[location];
-			free[location] = DELETED;
-			table[location] = null;
-			size--;
-			return removedElement;
-		}
-		return null;
-	}
+
 }

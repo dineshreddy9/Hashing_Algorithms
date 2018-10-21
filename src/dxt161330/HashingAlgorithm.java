@@ -1,10 +1,9 @@
 package dxt161330;
 
-import java.lang.reflect.Array;
-
 public abstract class HashingAlgorithm <T> {
 
     protected static final int FREE = 0, OCCUPIED = 1, DELETED = 2;
+    protected static final int INVALID_INDEX = -1;
     // to store the elements
     Object table[];
     // array to represent whether a particular index is free(0), an element exits(1), deleted(2)
@@ -25,7 +24,7 @@ public abstract class HashingAlgorithm <T> {
 
     public abstract boolean add(T x);
     public abstract  boolean contains(T x);
-    public abstract T remove(T x);
+    protected abstract int find(T x);
     // Code extracted from Java’s HashMap:
     protected final int hash(int h) {
         // This function ensures that hashCodes that differ only by
@@ -64,5 +63,22 @@ public abstract class HashingAlgorithm <T> {
      */
     public int size() {
         return size;
+    }
+
+    /**
+     * Removes an element. Returns the element removed if successful otherwise returns null
+     * @param x
+     * @return
+     */
+    public T remove(T x) {
+        int location = find(x);
+        if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
+            T removedElement = (T) table[location];
+            free[location] = DELETED;
+            table[location] = null;
+            size--;
+            return removedElement;
+        }
+        return null;
     }
 }

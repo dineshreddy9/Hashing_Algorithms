@@ -38,22 +38,26 @@ public class TestMain {
             tester.testAdd();
             tester.testRemove();
             tester.testContains();
-            tester.testOnSingleHash();
             tester.testResize();
-            tester.testNegativeHash();
             System.out.println(algo.getClass().getName() + " passed");
         }
+        tester.testNegativeHash();
+        tester.testOnHashConflict();
         System.out.println("All Tests passed");
     }
 
     private void testNegativeHash() {
         RobinHood<Integer> rbNegative = new RobinHood<>();
-        for(int i=0;i>-5;--i){
-            assert rbNegative.add(i);
-        }
-        assert rbNegative.size() == 5;
-        for(int i=0;i>-5;--i){
-            assert rbNegative.contains(i);
+        HashingAlgorithm<Integer> doubleHash = new DoubleHashing<>();
+        for (HashingAlgorithm<Integer> algo:Arrays.asList(rbNegative,doubleHash)) {
+            for (int i = 0; i > -5; --i) {
+                assert algo.add(i);
+            }
+            assert algo.size() == 5;
+            for (int i = 0; i > -5; --i) {
+                assert algo.contains(i);
+            }
+            System.out.println(algo.getClass().getName() + " Negative Hash test passed");
         }
     }
 
@@ -80,26 +84,30 @@ public class TestMain {
         }
     }
 
-    private void testOnSingleHash() {
-        RobinHood<DualHashClass> rb = new RobinHood<>();
-        for (int i = 0; i < 16; i++) {
-            assert  rb.add(new DualHashClass(i));
-        }
-        for (int i = 0; i < 16; i++) {
-            assert rb.contains(new DualHashClass(i));
-        }
-        DualHashClass obj13 = new DualHashClass(13);
-        DualHashClass obj5 = new DualHashClass(5);
-        assert rb.remove(obj13).equals(obj13);
-        assert rb.remove(obj5).equals(obj5);
-        for(int i=0;i<16;++i){
-            if(i==5||i==13){
-                assert !rb.contains(new DualHashClass(i));
-            }else {
-                assert rb.contains(new DualHashClass(i));
+    private void testOnHashConflict() {
+        HashingAlgorithm<DualHashClass> rb = new RobinHood<>();
+        HashingAlgorithm<DualHashClass> doubleHash = new DoubleHashing<>();
+        for (HashingAlgorithm<DualHashClass> algo:Arrays.asList(rb,doubleHash)) {
+            for (int i = 0; i < 16; i++) {
+                assert algo.add(new DualHashClass(i));
             }
+            for (int i = 0; i < 16; i++) {
+                assert algo.contains(new DualHashClass(i));
+            }
+            DualHashClass obj13 = new DualHashClass(13);
+            DualHashClass obj5 = new DualHashClass(5);
+            assert algo.remove(obj13).equals(obj13);
+            assert algo.remove(obj5).equals(obj5);
+            for (int i = 0; i < 16; ++i) {
+                if (i == 5 || i == 13) {
+                    assert !algo.contains(new DualHashClass(i));
+                } else {
+                    assert algo.contains(new DualHashClass(i));
+                }
+            }
+            algo.add(new DualHashClass(17));
+            System.out.println(algo.getClass().getName() + " HashConflict test passed");
         }
-        rb.add(new DualHashClass(17));
     }
 
     private void testResize() {
