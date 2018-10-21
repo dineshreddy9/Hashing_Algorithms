@@ -36,7 +36,20 @@ public class TestMain {
         tester.testRemove();
         tester.testContains();
         tester.testOnSingleHash();
+        tester.testResize();
+        tester.testNegativeHash();
         System.out.println("All Tests passed");
+    }
+
+    private void testNegativeHash() {
+        RobinHood<Integer> rbNegative = new RobinHood<>();
+        for(int i=0;i>-5;--i){
+            assert rbNegative.add(i);
+        }
+        assert rbNegative.size() == 5;
+        for(int i=0;i>-5;--i){
+            assert rbNegative.contains(i);
+        }
     }
 
     private void testAdd() {
@@ -50,7 +63,6 @@ public class TestMain {
         assert robinHood.remove(5)==5;
         assert robinHood.remove(10)==10;
         assert robinHood.remove(13)==13;
-        assert robinHood.size() == 12;
     }
 
     private void testContains() {
@@ -64,25 +76,39 @@ public class TestMain {
     }
 
     private void testOnSingleHash() {
-        RobinHood<SingleHashClass> rb = new RobinHood<>();
+        RobinHood<DualHashClass> rb = new RobinHood<>();
         for (int i = 0; i < 16; i++) {
-            assert  rb.add(new SingleHashClass(i));
+            assert  rb.add(new DualHashClass(i));
         }
         for (int i = 0; i < 16; i++) {
-            assert rb.contains(new SingleHashClass(i));
+            assert rb.contains(new DualHashClass(i));
         }
-        SingleHashClass obj13 = new SingleHashClass(13);
-        SingleHashClass obj5 = new SingleHashClass(5);
+        DualHashClass obj13 = new DualHashClass(13);
+        DualHashClass obj5 = new DualHashClass(5);
         assert rb.remove(obj13).equals(obj13);
         assert rb.remove(obj5).equals(obj5);
         for(int i=0;i<16;++i){
             if(i==5||i==13){
-                assert !rb.contains(new SingleHashClass(i));
+                assert !rb.contains(new DualHashClass(i));
             }else {
-                assert rb.contains(new SingleHashClass(i));
+                assert rb.contains(new DualHashClass(i));
             }
         }
+        rb.add(new DualHashClass(17));
     }
+
+    private void testResize() {
+        robinHood.add(5);
+        robinHood.add(10);
+        robinHood.add(13);
+        robinHood.add(16);
+        robinHood.add(17);
+        assert robinHood.size() == 17;
+        assert robinHood.capacity == 64;
+        testRemove();
+        testContains();
+    }
+
     /**
      * Runs the given function inside a try-catch block to capture and assert that given exception is raised
      * @param function function that needs to be run inside the try block
@@ -97,18 +123,21 @@ public class TestMain {
         }
     }
 
-    class SingleHashClass{
+    /**
+     * A test class that has only two hashCodes for all objects to test how different algorithm can handle these cases
+     */
+    class DualHashClass {
         private int data;
-        public SingleHashClass(int intVal){
+        public DualHashClass(int intVal){
             this.data = intVal;
         }
 
         @Override
         public boolean equals(Object other){
-            if (!(other instanceof SingleHashClass)){
+            if (!(other instanceof DualHashClass)){
                 return false;
             }
-            return this.data ==((SingleHashClass) other).data;
+            return this.data==((DualHashClass) other).data;
         }
 
         @Override
@@ -118,7 +147,7 @@ public class TestMain {
 
         @Override
         public int hashCode(){
-            return 1;
+            return data%2; //odd return 0 even return 1
         }
     }
 }
