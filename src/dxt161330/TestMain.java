@@ -87,29 +87,29 @@ public class TestMain {
     }
 
     private void testOnHashConflict() {
-        HashingAlgorithm<DualHashClass> rb = new RobinHood<>();
-        HashingAlgorithm<DualHashClass> doubleHash = new DoubleHashing<>();
-        for (HashingAlgorithm<DualHashClass> algo:Arrays.asList(rb,doubleHash)) {
+        HashingAlgorithm<ZeroOneHashClass> rb = new RobinHood<>();
+        HashingAlgorithm<ZeroOneHashClass> doubleHash = new DoubleHashing<>();
+        for (HashingAlgorithm<ZeroOneHashClass> algo:Arrays.asList(rb,doubleHash)) {
             for (int i = 0; i < 16; i++) {
-                assert algo.add(new DualHashClass(i));
+                assert algo.add(new ZeroOneHashClass(i));
             }
             for (int i = 0; i < 16; i++) {
-                assert algo.contains(new DualHashClass(i));
+                assert algo.contains(new ZeroOneHashClass(i));
             }
-            DualHashClass obj13 = new DualHashClass(13);
-            DualHashClass obj5 = new DualHashClass(5);
+            ZeroOneHashClass obj13 = new ZeroOneHashClass(13);
+            ZeroOneHashClass obj5 = new ZeroOneHashClass(5);
             assert algo.remove(obj13).equals(obj13);
             assert algo.remove(obj5).equals(obj5);
             for (int i = 0; i < 16; ++i) {
                 if (i == 5 || i == 13) {
-                    assert !algo.contains(new DualHashClass(i));
+                    assert !algo.contains(new ZeroOneHashClass(i));
                 } else {
-                    assert algo.contains(new DualHashClass(i));
+                    assert algo.contains(new ZeroOneHashClass(i));
                 }
             }
-            algo.add(new DualHashClass(17));
-            assert !algo.add(new DualHashClass(3)); //duplicate add
-            assert !algo.add(new DualHashClass(15)); //duplicate add
+            algo.add(new ZeroOneHashClass(17));
+            assert !algo.add(new ZeroOneHashClass(3)); //duplicate add
+            assert !algo.add(new ZeroOneHashClass(15)); //duplicate add
             System.out.println(algo.getClass().getName() + " HashConflict test passed");
         }
     }
@@ -139,32 +139,32 @@ public class TestMain {
             assert e.getClass() == expectedEx;
         }
     }
+}
 
-    /**
-     * A test class that has only two hashCodes for all objects to test how different algorithm can handle these cases
-     */
-    class DualHashClass {
-        private int data;
-        public DualHashClass(int intVal){
-            this.data = intVal;
-        }
+/**
+ * A test class that has only two hashCodes for all objects to test how different algorithms can handle these cases
+ */
+class ZeroOneHashClass {
+    private int data;
+    public ZeroOneHashClass(int intVal){
+        this.data = intVal;
+    }
 
-        @Override
-        public boolean equals(Object other){
-            if (!(other instanceof DualHashClass)){
-                return false;
-            }
-            return this.data==((DualHashClass) other).data;
+    @Override
+    public boolean equals(Object other){
+        if (!(other instanceof ZeroOneHashClass)){
+            return false;
         }
+        return this.data==((ZeroOneHashClass) other).data;
+    }
 
-        @Override
-        public String toString(){
-            return Integer.toString(data);
-        }
+    @Override
+    public String toString(){
+        return Integer.toString(data);
+    }
 
-        @Override
-        public int hashCode(){
-            return data%2; //odd return 0 even return 1
-        }
+    @Override
+    public int hashCode(){
+        return data%2; //odd return 0 even return 1
     }
 }
