@@ -76,7 +76,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		while(free[index] != FREE) { //when index has never been touched search can stop.
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
-			}else if(free[index]==DELETED){
+			}else if(free[index]==DELETED&&lastDelete==INVALID_INDEX){ //set to first deleted index only
 				lastDelete = index;
 			}
 			k++;
