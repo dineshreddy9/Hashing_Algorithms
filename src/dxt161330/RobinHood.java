@@ -9,32 +9,18 @@ package dxt161330;
  */
 public class RobinHood<T> extends HashingAlgorithm<T>{
 
-
 	/**
 	 * ratio of size to capacity after which resize should be done to ensure optimal working <b>this</b> algorithm
 	 */
 	private static final double RESIZE_THRESHOLD = 0.5;
-	//
-	private static final int MAX_DISPLACEMENT = 4;
 	private static final int INVALID_INDEX = -1;
 
 
 	/**
 	 *  Default constructor which initializes the table with default capacity as 32
  	 */
-	RobinHood() {
-		this(32);
-	}
-
-	/**
-	 *  Parameterized constructor which takes initial capacity as argument
-	 * @param capacity
-	 */
-	RobinHood(int capacity){
-		this.capacity = capacity;
-		table = new Object[this.capacity];
-		free = new int[this.capacity];
-		size = 0;
+	public RobinHood() {
+		super(32);
 	}
 
 	/**
@@ -57,7 +43,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 			resize();
 		}
 
-		int displacement = 0,swaps = 0;
+		int displacement = 0;
 		T startKey = x;
 		while(true) {
 			if(free[location]==FREE || free[location]==DELETED) {
@@ -65,7 +51,7 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 				size++;
 				free[location] = OCCUPIED;
 				return true;
-			} else if(displacement<(MAX_DISPLACEMENT)&&displacement((T) table[location], location) >= displacement(x, location)) {
+			} else if(displacement((T) table[location], location) >= displacement(x, location)) {
 				//element at location is more away from actual index than current element, continue search
 				displacement++;
 				location = (location + 1) % capacity;
@@ -119,17 +105,12 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	 */
 	private int find(T x) {
 		int index = indexFor(hash(x.hashCode()), capacity);
-		int displacement = 0;
-		while(displacement<MAX_DISPLACEMENT) {
+		while(free[index] != FREE) { //when index has never been touched search can stop.
 			//System.out.println(ik);
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
-			}else if(free[index] == FREE) {
-				//this index has never been touched hence search can stop here
-				return INVALID_INDEX;
 			}
 			index = (index + 1) % capacity;
-			++displacement;
 		}
 		return INVALID_INDEX;
 	}

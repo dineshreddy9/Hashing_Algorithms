@@ -1,6 +1,9 @@
 package dxt161330;
 
+import java.lang.reflect.Array;
+
 public abstract class HashingAlgorithm <T> {
+
     protected static final int FREE = 0, OCCUPIED = 1, DELETED = 2;
     // to store the elements
     Object table[];
@@ -8,6 +11,17 @@ public abstract class HashingAlgorithm <T> {
     protected int free[];
     // capacity is the length of the table. size is the number of elements in the table
     protected int capacity, size;
+
+    /**
+     *
+     * @param capacity
+     */
+    protected HashingAlgorithm(int capacity) {
+        this.table = new Object[capacity];
+        this.free = new int[capacity];
+        this.capacity = capacity;
+        this.size = 0;
+    }
 
     public abstract boolean add(T x);
     public abstract  boolean contains(T x);
@@ -36,7 +50,12 @@ public abstract class HashingAlgorithm <T> {
         free = new int[capacity];
         size=0;
         for(int i = 0; i < table2.length; i++) {
-            if(table2[i]!=null) add((T) table2[i]);
+            if(table2[i]!=null) add(cast(table2[i]));
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected T cast(Object t){
+        return (T) t;
     }
 }

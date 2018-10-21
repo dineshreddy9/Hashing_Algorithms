@@ -19,18 +19,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	 * Default constructor which initializes the table with default capacity as 32
  	 */
 	DoubleHashing(){
-		this(32);
-	}
-
-	/**
-	 * Parameterized constructor which takes initial capacity as argument
-	 * @param capacity
-	 */
-	DoubleHashing(int capacity){
-		this.capacity = capacity;
-		table = new Object[this.capacity];
-		free = new int[this.capacity];
-		size = 0;
+		super(32);
 	}
 
 	/**
