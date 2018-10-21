@@ -14,6 +14,7 @@ import java.util.Arrays;
 public class TestMain {
     private RobinHood<Integer> robinHood;
     private DoubleHashing<Integer> doubleHashing;
+    private HashingAlgorithm<Integer> currentAlgo;
     public TestMain(RobinHood<Integer> robinHood, DoubleHashing<Integer> doubleHashing){
         this.robinHood = robinHood;
         this.doubleHashing = doubleHashing;
@@ -32,12 +33,16 @@ public class TestMain {
         }
 
         TestMain tester = new TestMain(new RobinHood<>(),new DoubleHashing<>());
-        tester.testAdd();
-        tester.testRemove();
-        tester.testContains();
-        tester.testOnSingleHash();
-        tester.testResize();
-        tester.testNegativeHash();
+        for (HashingAlgorithm<Integer> algo: Arrays.asList(tester.robinHood,tester.doubleHashing)) {
+            tester.currentAlgo = algo;
+            tester.testAdd();
+            tester.testRemove();
+            tester.testContains();
+            tester.testOnSingleHash();
+            tester.testResize();
+            tester.testNegativeHash();
+            System.out.println(algo.getClass().getName() + " passed");
+        }
         System.out.println("All Tests passed");
     }
 
@@ -54,23 +59,23 @@ public class TestMain {
 
     private void testAdd() {
         for(int i=1;i<16;++i){
-            assert robinHood.add(i);
+            assert currentAlgo.add(i);
         }
-        assert robinHood.size() == 15;
+        assert currentAlgo.size() == 15;
     }
 
     private void testRemove() {
-        assert robinHood.remove(5)==5;
-        assert robinHood.remove(10)==10;
-        assert robinHood.remove(13)==13;
+        assert currentAlgo.remove(5)==5;
+        assert currentAlgo.remove(10)==10;
+        assert currentAlgo.remove(13)==13;
     }
 
     private void testContains() {
         for(int i=1;i<16;++i){
             if(i==5||i==10||i==13){
-                assert !robinHood.contains(i);
+                assert !currentAlgo.contains(i);
             }else {
-                assert robinHood.contains(i);
+                assert currentAlgo.contains(i);
             }
         }
     }
@@ -98,13 +103,13 @@ public class TestMain {
     }
 
     private void testResize() {
-        robinHood.add(5);
-        robinHood.add(10);
-        robinHood.add(13);
-        robinHood.add(16);
-        robinHood.add(17);
-        assert robinHood.size() == 17;
-        assert robinHood.capacity == 64;
+        currentAlgo.add(5);
+        currentAlgo.add(10);
+        currentAlgo.add(13);
+        currentAlgo.add(16);
+        currentAlgo.add(17);
+        assert currentAlgo.size() == 17;
+        assert currentAlgo.capacity == 64;
         testRemove();
         testContains();
     }

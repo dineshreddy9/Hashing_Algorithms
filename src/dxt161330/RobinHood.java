@@ -129,11 +129,4 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 		return null;
 	}
-
-	/**
-	 *	returns the number of elements in the table
- 	 */
-	public int size() {
-		return size;
-	}
 }

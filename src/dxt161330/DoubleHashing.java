@@ -116,12 +116,4 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		}
 		return null;
 	}
-
-	/**
-	 * returns the number of elements in the table
-	 * @return
-	 */
-	public int size() {
-		return size;
-	}
 }

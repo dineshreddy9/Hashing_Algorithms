@@ -58,4 +58,11 @@ public abstract class HashingAlgorithm <T> {
     protected T cast(Object t){
         return (T) t;
     }
+
+    /**
+     *	returns the number of elements in the table
+     */
+    public int size() {
+        return size;
+    }
 }
