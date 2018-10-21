@@ -9,15 +9,23 @@ package dxt161330;
  * @param <T>
  */
 public class DoubleHashing<T> extends HashingAlgorithm<T> {
-	// loadFactor = size/capacity
-	private double loadFactor;
+	/**
+	 * ratio of size to capacity after which resize should be done to ensure optimal working for <b>this</b> algorithm
+	 */
+	private static final double RESIZE_THRESHOLD = 0.5;
 
-	// Default constructor which initializes the table with default capacity as 32 
+
+	/**
+	 * Default constructor which initializes the table with default capacity as 32
+ 	 */
 	DoubleHashing(){
 		this(32);
 	}
 
-	// Parameterized constructor which takes initial capacity as argument
+	/**
+	 * Parameterized constructor which takes initial capacity as argument
+	 * @param capacity
+	 */
 	DoubleHashing(int capacity){
 		this.capacity = capacity;
 		table = new Object[this.capacity];
@@ -25,33 +33,39 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		size = 0;
 	}
 
-	// adds an element to the table
-	// returns true if the element is added successfully otherwise returns false
+	/**
+	 * adds an element to the table
+	 * returns true if the element is added successfully otherwise returns false
+	 */
 	public boolean add(T x) {
-
+		double loadFactor = ((double) size+1)/capacity;
+		if(loadFactor > RESIZE_THRESHOLD) {
+			resize();
+		}
 		int location = find(x);
 		if(location == -1 || contains(x)) {
 			return false;
-		}
-
-		else {
+		} else {
 			table[location] = x;
 			free[location] = OCCUPIED;
 			size++;
-			loadFactor = (double) size/capacity;
-			// considering threshold = 0.5
-			if(loadFactor > 0.5) {
-				resize();
-			}
 			return true;
 		}
 	}
 
-	public int secondHashFunction(T x) {
+	/**
+	 * @param x
+	 * @return
+	 */
+	public int hash2(T x) {
 		return Math.abs(indexFor(hash(x.hashCode()),2*capacity));
 	}
 
-	// Checks whether the table contains x or not
+	/**
+	 * Checks whether the table contains x or not
+	 * @param x
+	 * @return
+	 */
 	public boolean contains(T x) {
 
 		int location = find(x);
@@ -61,7 +75,11 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		return false;
 	}
 
-	// search for x and return index of x. If x is not found, return index where x can be added.
+	/**
+	 * search for x and return index of x. If x is not found, return index where x can be added.
+	 * @param x
+	 * @return
+	 */
 	public int find(T x) {
 		int k = 0, ik = indexFor(hash(x.hashCode()),capacity);
 		while(true) {
@@ -72,7 +90,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 				break;
 			} else if(free[ik] == OCCUPIED) {
 				k++;
-				ik = (indexFor(hash(x.hashCode()),capacity) + k * secondHashFunction(x)) % capacity;
+				ik = (indexFor(hash(x.hashCode()),capacity) + k * hash2(x)) % capacity;
 			} else if(size == capacity) {
 				return -1;
 			}
@@ -82,7 +100,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 		while(true) {
 			k++;
-			ik = (hash(x.hashCode()) + k * secondHashFunction(x)) % capacity;
+			ik = (hash(x.hashCode()) + k * hash2(x)) % capacity;
 			if(!(table[ik] == null) && table[ik].equals(x)) {
 				return ik;
 			}
@@ -93,7 +111,11 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	}
 
-	// Removes an element. Returns the element removed if successful otherwise returns null
+	/**
+	 * Removes an element. Returns the element removed if successful otherwise returns null
+	 * @param x
+	 * @return
+	 */
 	public T remove(T x) {
 		int location = find(x);
 		if(!(table[location] == null) && table[location].equals(x)) {
@@ -106,7 +128,10 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		return null;
 	}
 
-	// returns the number of elements in the table
+	/**
+	 * returns the number of elements in the table
+	 * @return
+	 */
 	public int size() {
 		return size;
 	}

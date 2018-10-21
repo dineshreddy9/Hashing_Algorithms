@@ -10,7 +10,9 @@ package dxt161330;
 public class RobinHood<T> extends HashingAlgorithm<T>{
 
 
-	//ratio of size to capacity after which resize should be done to ensure optimal working
+	/**
+	 * ratio of size to capacity after which resize should be done to ensure optimal working <b>this</b> algorithm
+	 */
 	private static final double RESIZE_THRESHOLD = 0.5;
 	//
 	private static final int MAX_DISPLACEMENT = 4;
