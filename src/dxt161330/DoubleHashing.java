@@ -1,19 +1,14 @@
-/*
- * @author Dinesh, Kautil
- * Double Hashing Algorithm: An Open Addressing scheme in which a second hash function ( h2 )
- *  is used to determine step length: ik = (h(x) + k * h2(x)) % n.
- * Ver 1.0: 10/17/2018 
- */
+
 package dxt161330;
 
+/**
+ * Double Hashing Algorithm: An Open Addressing scheme in which a second hash function ( h2 )
+ *  is used to determine step length: ik = (h(x) + k * h2(x)) % n.
+ * Ver 1.0: 10/17/2018
+ * @author Dinesh, Kautil
+ * @param <T>
+ */
 public class DoubleHashing<T> extends HashingAlgorithm<T> {
-
-	// to store the elements
-	Object table[];
-	// array to represent whether a particular index is free(0), an element exits(1), deleted(2)
-	private int free[];
-	// capacity is the length of the table. size is the number of elements in the table
-	private int capacity, size;
 	// loadFactor = size/capacity
 	private double loadFactor;
 
@@ -46,22 +41,9 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 			loadFactor = (double) size/capacity;
 			// considering threshold = 0.5
 			if(loadFactor > 0.5) {
-				rehash();
+				resize();
 			}
 			return true;
-		}
-	}
-
-	// called when the loadfactor exceeds a threshold value
-	// capacity of the table is doubled and the elements are rehashed
-	public void rehash() {
-		Object[] table2 = table;
-		capacity = 2*capacity;
-		table = new Object[capacity];
-		free = new int[capacity];
-		size=0;
-		for(int i = 0; i < table2.length; i++) {
-			if(table2[i]!=null) add((T) table2[i]);
 		}
 	}
 

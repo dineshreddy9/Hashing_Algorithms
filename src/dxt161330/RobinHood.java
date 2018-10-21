@@ -1,28 +1,33 @@
-/*
- * @author Dinesh, Kautil
- * RobinHood Hashing Algorithm: An Open Addressing scheme in which a new element being inserted with a larger probe
- *  count can displace an existing element in the table with a smaller probe count.
- * Ver 1.0: 10/15/2018 
- */
 package dxt161330;
 
+/**
+ * RobinHood Hashing Algorithm: An Open Addressing scheme in which a new element being inserted with a larger probe
+ * count can displace an existing element in the table with a smaller probe count.
+ * Ver 1.0: 10/15/2018
+ * @author Dinesh, Kautil
+ * @param <T>
+ */
 public class RobinHood<T> extends HashingAlgorithm<T>{
-	
-	// to store the elements
-	Object table[];
-	// array to represent whether a particular index is free(0), an element exits(1), deleted(2) 
-	private int free[];
-	// capacity is the length of the table. size is the number of elements in the table
-	private int capacity, size;
-	// loadFactor = size/capacity
-	private double loadFactor;
-	
-	// Default constructor which initializes the table with default capacity as 32 
+
+
+	//ratio of size to capacity after which resize should be done to ensure optimal working
+	private static final double RESIZE_THRESHOLD = 0.5;
+	//
+	private static final int MAX_DISPLACEMENT = 4;
+	private static final int INVALID_INDEX = -1;
+
+
+	/**
+	 *  Default constructor which initializes the table with default capacity as 32
+ 	 */
 	RobinHood() {
 		this(32);
 	}
-	
-	// Parameterized constructor which takes initial capacity as argument
+
+	/**
+	 *  Parameterized constructor which takes initial capacity as argument
+	 * @param capacity
+	 */
 	RobinHood(int capacity){
 		this.capacity = capacity;
 		table = new Object[this.capacity];
@@ -30,56 +35,62 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		size = 0;
 	}
 
-	// adds an element to the table
-	// returns true if the element is added successfully otherwise returns false
+	/**
+	 * adds an element to the table returns true
+	 * if the element is added successfully otherwise returns false
+	 * @param x
+	 * @return
+	 */
 	public boolean add(T x) {
-
+		if(x==null){
+			throw new IllegalArgumentException("Key cannot be null");
+		}
 		if(contains(x)) {
 			return false;
 		}
 
 		int location = indexFor(hash(x.hashCode()),capacity);
-		int displacement = 0;
+		double loadFactor = ((double) size+1)/capacity;
+		if(loadFactor > RESIZE_THRESHOLD) {
+			resize();
+		}
 
-		while(size != capacity) {
+		int displacement = 0,swaps = 0;
+		T startKey = x;
+		while(true) {
 			if(free[location]==FREE || free[location]==DELETED) {
 				table[location] = x;
 				size++;
 				free[location] = OCCUPIED;
-				loadFactor = (double) size/capacity;
-				// considering threshold = 0.5
-				if(loadFactor > 0.5) {
-					rehash();
-				}
 				return true;
-			} else if(displacement((T) table[location], location) >= displacement(x, location)) {
+			} else if(displacement<(MAX_DISPLACEMENT)&&displacement((T) table[location], location) >= displacement(x, location)) {
+				//element at location is more away from actual index than current element, continue search
 				displacement++;
 				location = (location + 1) % capacity;
 			} else {
+				//element at location is not as far as current element,
+				// replace element in table and make replaced element search for a new place
 				T temp = x;
 				x = (T) table[location];
 				table[location] = temp;
 				location = (location + 1) % capacity;
 				displacement = displacement(x, location);
+				if(x.equals(startKey)){
+					//we have reached to the start point
+					break;
+				}
 			}
 		}
+		//all the locations tried
 		return false;
 	}
-	
-	// called when the loadfactor exceeds a threshold value
-	// capacity of the table is doubled and the elements are rehashed
-	public void rehash() {
-		Object[] table2 = table;
-		capacity = 2*capacity;
-		table = new Object[capacity];
-		free = new int[capacity];
-		size=0;
-		for(int i = 0; i < table2.length; i++) {
-			if(table2[i]!=null) add((T) table2[i]);
-		}
-	}
-	
-	// Calculate displacement of x from its ideal location of h(x).
+
+	/**
+	 * Calculate displacement of x from its ideal location of h(x).
+	 * @param x
+	 * @param loc
+	 * @return
+	 */
 	public int displacement(T x, int loc) {
 		int i0 = indexFor(hash(x.hashCode()), capacity);
 		if(loc >= i0) {
@@ -89,50 +100,44 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 	}
 
-	// Checks whether the table contains x or not
-	public boolean contains(T x) {
-
-		int location = find(x);
-		if(!(table[location] == null) && table[location].equals(x)) {
-			return true;
-		}
-		return false;
+	/**
+	 * Checks whether the table contains x or not
+	 * @param key
+	 * @return
+	 */
+	public boolean contains(T key) {
+		int location = find(key);
+		return location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(key);
 	}
-	
-	// search for x and return index of x. If x is not found, return index where x can be added.
-	public int find(T x) {
 
-		int ik = indexFor(hash(x.hashCode()), capacity);
-		while(true) {
+	/**
+	 * search for x and return index of x. If x is not found, return index where x can be added.
+	 * @param x
+	 * @return
+	 */
+	private int find(T x) {
+		int index = indexFor(hash(x.hashCode()), capacity);
+		int displacement = 0;
+		while(displacement<MAX_DISPLACEMENT) {
 			//System.out.println(ik);
-			if(free[ik] == FREE || (table[ik]!=null && table[ik].equals(x))) {
-				return ik;
-			} else if(free[ik] == OCCUPIED) {
-				break;
-			} else if(free[ik] == DELETED) {
-				ik = (ik + 1) % capacity;;
+			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
+				return index;
+			}else if(free[index] == FREE) {
+				//this index has never been touched hence search can stop here
+				return INVALID_INDEX;
 			}
+			index = (index + 1) % capacity;
+			++displacement;
 		}
-
-		int deletedSpot = ik;
-		
-		while(true) {
-			
-			ik = (ik + 1) % capacity;
-			if(!(table[ik] == null) && table[ik].equals(x)) {
-				return ik;
-			}
-			if(free[ik] == FREE) {
-				return deletedSpot;
-			}
-		}
-
+		return INVALID_INDEX;
 	}
-	
-	// Removes an element. Returns the element removed if successful otherwise returns null
+
+	/**
+	 *	Removes an element. Returns the element removed if successful otherwise returns null
+ 	 */
 	public T remove(T x) {
 		int location = find(x);
-		if(!(table[location] == null) && table[location].equals(x)) {
+		if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
 			T removedElement = (T) table[location];
 			free[location] = DELETED;
 			table[location] = null;
@@ -141,8 +146,10 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 		}
 		return null;
 	}
-	
-	// returns the number of elements in the table
+
+	/**
+	 *	returns the number of elements in the table
+ 	 */
 	public int size() {
 		return size;
 	}
