@@ -98,13 +98,14 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	}
 
 	/**
-	 * search for x and return index of x. If x is not found, return index where x can be added.
+	 * search for x and return index of x.
 	 * @param x
 	 * @return
 	 */
 	protected int find(T x) {
 		int index = indexFor(hash(x.hashCode()), capacity);
-		while(free[index] != FREE) { //when index has never been touched search can stop.
+		while(free[index] != FREE && //when index has never been touched search can stop.
+				(free[index]==DELETED||displacement((T) table[index], index) >= displacement(x, index))) {
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
 			}

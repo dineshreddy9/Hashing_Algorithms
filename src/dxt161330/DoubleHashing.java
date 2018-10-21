@@ -31,29 +31,15 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		if(loadFactor > RESIZE_THRESHOLD) {
 			resize();
 		}
-		if(contains(x)) {
+		int findLocation = find(x);
+		if(!(table[findLocation] == null) && table[findLocation].equals(x)) {
+			//value already exists in the table
 			return false;
 		}
-
-		int k = 0;
-		int index = indexFor(hash(x.hashCode()),capacity);
-		int startIndex = index;
-		int secondHashVal = indexForHash2(x);
-		while(true) {
-			if(free[index]==FREE || free[index]==DELETED) {
-				table[index] = x;
-				size++;
-				free[index] = OCCUPIED;
-				return true;
-			}
-			if(table[index].equals(x)){
-				//we have reached to the starting point
-				break;
-			}
-			k++;
-			index = (startIndex + k * secondHashVal) % capacity;
-		}
-		return false;
+		table[findLocation] = x;
+		free[findLocation] = OCCUPIED;
+		size++;
+		return true;
 	}
 
 	/**
@@ -71,7 +57,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	 */
 	public boolean contains(T x) {
 		int location = find(x);
-		if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
+		if(!(table[location] == null) && table[location].equals(x)) {
 			return true;
 		}
 		return false;
@@ -86,14 +72,17 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		int k = 0;
 		int index = indexFor(hash(x.hashCode()),capacity);
 		int startIndex = index,secondHashVal = indexForHash2(x);
+		int lastDelete = INVALID_INDEX;
 		while(free[index] != FREE) { //when index has never been touched search can stop.
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
+			}else if(free[index]==DELETED){
+				lastDelete = index;
 			}
 			k++;
 			index = (startIndex + k * secondHashVal) % capacity;
 		}
-		return INVALID_INDEX;
+		return lastDelete==INVALID_INDEX?index:lastDelete;
 	}
 
 	private int indexForHash2(T x){

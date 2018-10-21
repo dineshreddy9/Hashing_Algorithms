@@ -65,6 +65,8 @@ public class TestMain {
         for(int i=1;i<16;++i){
             assert currentAlgo.add(i);
         }
+        assert !currentAlgo.add(1); //duplicate add
+        assert !currentAlgo.add(7); //duplicate add
         assert currentAlgo.size() == 15;
     }
 
@@ -106,6 +108,8 @@ public class TestMain {
                 }
             }
             algo.add(new DualHashClass(17));
+            assert !algo.add(new DualHashClass(3)); //duplicate add
+            assert !algo.add(new DualHashClass(15)); //duplicate add
             System.out.println(algo.getClass().getName() + " HashConflict test passed");
         }
     }
