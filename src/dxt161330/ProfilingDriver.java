@@ -18,6 +18,7 @@ public class ProfilingDriver {
         Timer benchMark = new Timer();
         benchMark.start();
         uniqueElements = distinctElements(randomArr,javaSet);
+        removeAll(randomArr,javaSet);
         benchMark.end();
         System.out.println("Java uniqueElements = " + uniqueElements);
         System.out.println(benchMark);
@@ -25,6 +26,7 @@ public class ProfilingDriver {
         Timer doubleHashTime = new Timer();
         doubleHashTime.start();
         uniqueElements = distinctElements(randomArr,doubleHashedSet);
+        removeAll(randomArr,javaSet);
         doubleHashTime.end();
         System.out.println("DoubleHashing uniqueElements = " + uniqueElements);
         System.out.println(doubleHashTime);
@@ -32,13 +34,13 @@ public class ProfilingDriver {
         Timer robinHoodTime = new Timer();
         robinHoodTime.start();
         uniqueElements = distinctElements(randomArr,robinHoodSet);
+        removeAll(randomArr,javaSet);
         robinHoodTime.end();
         System.out.println("RobingHood uniqueElements = " + uniqueElements);
         System.out.println(robinHoodTime);
 
     }
     private static int distinctElements(int[] arr, Object rawSet){
-        Timer javaTimer = new Timer();
         HashingAlgorithm<Integer> customHashAlgo = null;
         HashSet<Integer> javaHash = null;
         if(rawSet instanceof HashingAlgorithm){
@@ -46,16 +48,38 @@ public class ProfilingDriver {
         }else {
             javaHash = (HashSet<Integer>) rawSet;
         }
-        javaTimer.start();
         for(int element: arr) {
-            if(javaHash!=null)
-                javaHash.add(element);
-            else
-                customHashAlgo.add(element);
+            if(javaHash!=null) {
+                if(!javaHash.contains(element)) //using contains just to realistic usage even though duplicates are removed
+                    javaHash.add(element);
+            }
+            else {
+                if(!customHashAlgo.contains(element))
+                    customHashAlgo.add(element);
+            }
         }
         if(javaHash!=null)
             return javaHash.size();
         return customHashAlgo.size();
+    }
+    private static void removeAll(int[] arr, Object rawSet) {
+        HashingAlgorithm<Integer> customHashAlgo = null;
+        HashSet<Integer> javaHash = null;
+        if(rawSet instanceof HashingAlgorithm){
+            customHashAlgo = (HashingAlgorithm<Integer>) rawSet;
+        }else {
+            javaHash = (HashSet<Integer>) rawSet;
+        }
+        for(int element: arr) {
+            if(javaHash!=null) {
+                if(javaHash.contains(element))
+                    javaHash.remove(element);
+            }
+            else {
+                if(customHashAlgo.contains(element))
+                    customHashAlgo.remove(element);
+            }
+        }
     }
     private static int[] getRandomArray(int length){
         Random r = new Random();
