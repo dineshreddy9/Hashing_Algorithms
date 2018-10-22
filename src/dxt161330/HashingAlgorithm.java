@@ -1,5 +1,10 @@
 package dxt161330;
 
+/**
+ * The base class for the two hashing algorithms
+ * @param <T> type of the element stored
+ * @author Dinesh, Kautil
+ */
 public abstract class HashingAlgorithm <T> {
 
     protected static final int FREE = 0, OCCUPIED = 1, DELETED = 2;
@@ -12,8 +17,7 @@ public abstract class HashingAlgorithm <T> {
     protected int capacity, size;
 
     /**
-     *
-     * @param capacity
+     * @param capacity no of elements that can be stored
      */
     protected HashingAlgorithm(int capacity) {
         this.table = new Object[capacity];
@@ -22,10 +26,33 @@ public abstract class HashingAlgorithm <T> {
         this.size = 0;
     }
 
+    /**
+     * adds an element to the table
+     * returns true if the element is added successfully otherwise returns false
+     * @param x element to be added
+     * @return true is added false else
+     */
     public abstract boolean add(T x);
+    /**
+     * Checks whether the table contains x or not
+     * @param x element to be checked for
+     * @return true if present false else
+     */
     public abstract  boolean contains(T x);
+
+    /**
+     * Util method to find the location of given element.
+     * Note that implementations can have a different return meanings
+     * @param x element to be searched for
+     * @return index if found, or INVALID_INDEX(-1) when not found
+     */
     protected abstract int find(T x);
-    // Code extracted from Java’s HashMap:
+
+    /**
+     * Hash of the elements hashcode
+     * Code extracted from Java’s HashMap
+     * @param h hashcode of element
+     */
     protected final int hash(int h) {
         // This function ensures that hashCodes that differ only by
         // constant multiples at each bit position have a bounded
@@ -33,6 +60,13 @@ public abstract class HashingAlgorithm <T> {
         h ^= (h >>> 20) ^ (h >>> 12);
         return h ^ (h >>> 7) ^ (h >>> 4);
     }
+
+    /**
+     * Hash to index mapping
+     * @param h hash value
+     * @param length current capacity of the map
+     * @return index for given hash
+     */
     protected int indexFor(int h, int length) {
         // length = table.length is a power of 2 // Key x is stored at table[ hash( x.hashCode( ) ) & ( table.length − 1 ) ].
         return h & (length-1);
@@ -53,6 +87,10 @@ public abstract class HashingAlgorithm <T> {
         }
     }
 
+
+    /**
+     * Util method to box the elements
+     */
     @SuppressWarnings("unchecked")
     protected T cast(Object t){
         return (T) t;
@@ -67,8 +105,8 @@ public abstract class HashingAlgorithm <T> {
 
     /**
      * Removes an element. Returns the element removed if successful otherwise returns null
-     * @param x
-     * @return
+     * @param x element to be removed
+     * @return removed element
      */
     public T remove(T x) {
         int location = find(x);

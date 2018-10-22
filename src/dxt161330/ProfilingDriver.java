@@ -1,11 +1,12 @@
 package dxt161330;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Scanner;
 
+/**
+ * This class is used to compare the performance of the Java's set class vs Custom open addressing schemes implemented
+ */
 public class ProfilingDriver {
     public static void main(String[] args) throws IOException {
         HashSet<Integer> javaSet = new HashSet<>();

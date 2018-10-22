@@ -1,4 +1,4 @@
-Team Members: Dinesh Reddy Thokala(dxt161330), Kautil Desireddy(KRD180000)
+Team Members: Dinesh Reddy Thokala(dxt161330), Kautil Desireddy(krd180000)
 All the unix-commands below assume you are at the root of the submission folder.
 
 Steps to compile and run the program:

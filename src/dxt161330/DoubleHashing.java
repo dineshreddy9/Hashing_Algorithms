@@ -6,7 +6,7 @@ package dxt161330;
  *  is used to determine step length: ik = (h(x) + k * h2(x)) % n.
  * Ver 1.0: 10/17/2018
  * @author Dinesh, Kautil
- * @param <T>
+ * @param <T> type of stored element
  */
 public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	/**
@@ -25,8 +25,13 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	/**
 	 * adds an element to the table
 	 * returns true if the element is added successfully otherwise returns false
+	 * @param x element to be added
+	 * @return true is added false else
 	 */
 	public boolean add(T x) {
+		if(x==null){
+			throw new IllegalArgumentException("Key cannot be null");
+		}
 		double loadFactor = ((double) size+1)/capacity;
 		if(loadFactor > RESIZE_THRESHOLD) {
 			resize();
@@ -43,8 +48,8 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	}
 
 	/**
-	 * @param x
-	 * @return
+	 * The second hash function
+	 * @param x hashcode of element x
 	 */
 	private int hash2(T x) {
 		return Math.abs(x.hashCode())%9;
@@ -52,10 +57,13 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	/**
 	 * Checks whether the table contains x or not
-	 * @param x
-	 * @return
+	 * @param x element to be checked for
+	 * @return true if present false else
 	 */
 	public boolean contains(T x) {
+		if(x==null){
+			throw new IllegalArgumentException("Key cannot be null");
+		}
 		int location = find(x);
 		if(!(table[location] == null) && table[location].equals(x)) {
 			return true;
@@ -65,8 +73,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 
 	/**
 	 * search for x and return index of x. If x is not found, return index where x can be added.
-	 * @param x
-	 * @return
+	 * @param x element
 	 */
 	protected int find(T x) {
 		int k = 0;
@@ -89,6 +96,10 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 		return lastDelete==INVALID_INDEX?index:lastDelete;
 	}
 
+	/**
+	 * mapping of hashFunction2 to an index
+	 * @param x element
+	 */
 	private int indexForHash2(T x){
 		return 1 + hash2(x); //+1 to avoid it being 0
 	}

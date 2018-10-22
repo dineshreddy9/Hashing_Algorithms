@@ -5,7 +5,7 @@ package dxt161330;
  * count can displace an existing element in the table with a smaller probe count.
  * Ver 1.0: 10/15/2018
  * @author Dinesh, Kautil
- * @param <T>
+ * @param <T> type of stored element
  */
 public class RobinHood<T> extends HashingAlgorithm<T>{
 
@@ -25,8 +25,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	/**
 	 * adds an element to the table returns true
 	 * if the element is added successfully otherwise returns false
-	 * @param x
-	 * @return
+	 * @param x element to be added
+	 * @return true if added false else
 	 */
 	public boolean add(T x) {
 		if(x==null){
@@ -74,9 +74,9 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 
 	/**
 	 * Calculate displacement of x from its ideal location of h(x).
-	 * @param x
-	 * @param loc
-	 * @return
+	 * @param x element
+	 * @param loc current index
+	 * @return displacement from actual index
 	 */
 	private int displacement(T x, int loc) {
 		int i0 = indexFor(hash(x.hashCode()), capacity);
@@ -89,18 +89,21 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 
 	/**
 	 * Checks whether the table contains x or not
-	 * @param key
-	 * @return
+	 * @param key element
+	 * @return true if present false else
 	 */
 	public boolean contains(T key) {
+		if(key==null){
+			throw new IllegalArgumentException("Key cannot be null");
+		}
 		int location = find(key);
 		return location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(key);
 	}
 
 	/**
 	 * search for x and return index of x.
-	 * @param x
-	 * @return
+	 * @param x element to be searched for
+	 * @return index if found, or INVALID_INDEX(-1) when not found
 	 */
 	protected int find(T x) {
 		int index = indexFor(hash(x.hashCode()), capacity);
