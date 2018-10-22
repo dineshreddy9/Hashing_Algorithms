@@ -73,7 +73,7 @@ public abstract class HashingAlgorithm <T> {
     public T remove(T x) {
         int location = find(x);
         if(location!=INVALID_INDEX && !(table[location] == null) && table[location].equals(x)) {
-            T removedElement = (T) table[location];
+            T removedElement = cast(table[location]);
             free[location] = DELETED;
             table[location] = null;
             size--;

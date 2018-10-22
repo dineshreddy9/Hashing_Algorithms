@@ -36,12 +36,12 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 			return false;
 		}
 
-		int location = indexFor(hash(x.hashCode()),capacity);
 		double loadFactor = ((double) size+1)/capacity;
 		if(loadFactor > RESIZE_THRESHOLD) {
 			resize();
 		}
 
+		int location = indexFor(hash(x.hashCode()),capacity);
 		int displacement = 0;
 		T startKey = x;
 		while(true) {
@@ -104,8 +104,8 @@ public class RobinHood<T> extends HashingAlgorithm<T>{
 	 */
 	protected int find(T x) {
 		int index = indexFor(hash(x.hashCode()), capacity);
-		while(free[index] != FREE && //when index has never been touched search can stop.
-				(free[index]==DELETED||displacement((T) table[index], index) >= displacement(x, index))) {
+		while(free[index] != FREE) { //when index has never been touched search can stop.
+
 			if(free[index]!=DELETED && table[index]!=null && table[index].equals(x)){
 				return index;
 			}
