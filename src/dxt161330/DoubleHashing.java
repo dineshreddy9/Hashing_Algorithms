@@ -47,7 +47,7 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 	 * @return
 	 */
 	private int hash2(T x) {
-		return hash(x.hashCode()*x.hashCode());
+		return Math.abs(x.hashCode())%9;
 	}
 
 	/**
@@ -81,11 +81,15 @@ public class DoubleHashing<T> extends HashingAlgorithm<T> {
 			}
 			k++;
 			index = (startIndex + k * secondHashVal) % capacity;
+			if(index==startIndex){
+				//reached the start again.
+				break;
+			}
 		}
 		return lastDelete==INVALID_INDEX?index:lastDelete;
 	}
 
 	private int indexForHash2(T x){
-		return 1 + hash2(x)%9; //+1 to avoid it being 0
+		return 1 + hash2(x); //+1 to avoid it being 0
 	}
 }
